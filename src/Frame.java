@@ -34,23 +34,13 @@ public class Frame extends Component implements KeyListener{
 		Graphics2D g = (Graphics2D)gs;
 		g.scale(SCALE, SCALE);
 		
+		game.scene.update();
 		game.scene.draw(g);
 		
-		if (isKeyPressed(Keys.UP)) {
-			game.scene.player.sprite.setAnimation(3);
-		}
-		
-		if (isKeyPressed(Keys.DOWN)) {
-			game.scene.player.sprite.setAnimation(0);
-		}
-		
-		if (isKeyPressed(Keys.LEFT)) {
-			game.scene.player.sprite.setAnimation(1);
-		}
-		
-		if (isKeyPressed(Keys.RIGHT)) {
-			game.scene.player.sprite.setAnimation(2);
-		}
+		if (isKeyPressed(Keys.UP)) 		{game.scene.player.move(Direction.UP);}
+		if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
+		if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
+		if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
 		
 		Sprites.LOGO.draw(g, 10, 10);
 		
