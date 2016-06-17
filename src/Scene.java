@@ -30,9 +30,10 @@ public class Scene {
 			tileHeight = map[0][0].getHeight();
 
 			entities.add(player);
-			entities.add(new Slime(Sprites.SLIME, 12, 2));
-			entities.add(new Slime(Sprites.SLIME, 12, 7));
-			entities.add(new Slime(Sprites.SLIME, 7, 4));
+			entities.add(new Slime(12, 2));
+			entities.add(new Slime(12, 7));
+			entities.add(new Slime(7, 4));
+			entities.add(new Spooder(2, 7));
 			
 		} catch (Exception e) {
 			System.err.println("Failed to load map: " + mapPath);
