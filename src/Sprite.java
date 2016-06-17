@@ -22,6 +22,7 @@ public class Sprite {
 	}
 	
 	public Sprite(String url) {
+		url = "assets/" + url;
 		try {
 			image = ImageIO.read(Sprite.class.getResource(url));
 		} catch (Exception e) {
@@ -36,7 +37,6 @@ public class Sprite {
 			Scanner scanner = new Scanner(Sprite.class.getResourceAsStream(url));
 			
 			while (scanner.hasNextInt()) {
-				System.out.println("HERE");
 				//First line is the size of animation
 				int frames = scanner.nextInt();
 				int rate = scanner.nextInt();
@@ -46,9 +46,11 @@ public class Sprite {
 				Animation animation = new Animation(frames, rate, loops, width, height);
 				int x = 0;
 				int y = 0;
+				System.out.println("Animation:");
 				for (int i = 0; i < frames; i++) {
 					x += scanner.nextInt();
 					y += scanner.nextInt();
+					System.out.println("	(" + x + ", " + y + ")");
 					animation.addFrame(x, y);
 				}
 				animations.add(animation);
@@ -58,6 +60,19 @@ public class Sprite {
 			e.printStackTrace();
 		}
 		System.out.println(animations.size() + " animations loaded");
+	}
+	
+	public void setAnimation(int id) {
+		if (animation == id) { return; }
+		animation = id;
+		frame = 0;
+	}
+	
+	public int getWidth() {
+		return animations.get(0).width;
+	}
+	public int getHeight() {
+		return animations.get(0).height;
 	}
 
 	//Draw and go to the next frame
@@ -73,7 +88,6 @@ public class Sprite {
 		}
 		
 		Point pos = a.getFrame(frameNum);
-		
 		g.drawImage(image,x,y,x+a.width,y+a.height,pos.x,pos.y,pos.x+a.width,pos.y+a.height,null);
 	}
 }

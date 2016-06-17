@@ -1,25 +1,56 @@
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 
-public class Frame extends Component {
+public class Frame extends Component implements KeyListener{
 	public static int SCALE = 4;
+	public Game game;
+	private boolean keyMap[] = new boolean[10];
+	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
 	
-	public static void main(String[] args) {
+	public Frame(Game game) {
+		this.game = game;
 		
-		JFrame frame = new JFrame("Azure");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(240 * Frame.SCALE, 160 * Frame.SCALE);	//Gameboy advance resolution
-		frame.add(new Frame());
-		frame.setVisible(true);
+		keyMapping.put(KeyEvent.VK_UP, 		Keys.UP);
+		keyMapping.put(KeyEvent.VK_DOWN, 	Keys.DOWN);
+		keyMapping.put(KeyEvent.VK_LEFT, 	Keys.LEFT);
+		keyMapping.put(KeyEvent.VK_RIGHT, 	Keys.RIGHT);
+		keyMapping.put(KeyEvent.VK_ENTER, 	Keys.START);
+		keyMapping.put(KeyEvent.VK_SHIFT, 	Keys.SELECT);
+		keyMapping.put(KeyEvent.VK_Z, 		Keys.A);
+		keyMapping.put(KeyEvent.VK_X, 		Keys.B);
+		keyMapping.put(KeyEvent.VK_A, 		Keys.L);
+		keyMapping.put(KeyEvent.VK_S,	 	Keys.R);
+		
 	}
 	
 	@Override
 	public void paint(Graphics gs) {
 		Graphics2D g = (Graphics2D)gs;
 		g.scale(SCALE, SCALE);
+		
+		game.scene.draw(g);
+		
+		if (isKeyPressed(Keys.UP)) {
+			game.scene.player.sprite.setAnimation(3);
+		}
+		
+		if (isKeyPressed(Keys.DOWN)) {
+			game.scene.player.sprite.setAnimation(0);
+		}
+		
+		if (isKeyPressed(Keys.LEFT)) {
+			game.scene.player.sprite.setAnimation(1);
+		}
+		
+		if (isKeyPressed(Keys.RIGHT)) {
+			game.scene.player.sprite.setAnimation(2);
+		}
 		
 		Sprites.LOGO.draw(g, 10, 10);
 		
@@ -30,4 +61,21 @@ public class Frame extends Component {
 		}
 		repaint();
 	}
+
+	public boolean isKeyPressed(Keys k) {
+		return keyMap[k.ordinal()];
+	}
+
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		keyMap[keyMapping.get(arg0.getKeyCode()).ordinal()] = true;
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		keyMap[keyMapping.get(arg0.getKeyCode()).ordinal()] = false;
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {}
 }
