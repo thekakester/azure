@@ -1,4 +1,7 @@
 import java.awt.Graphics;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -8,15 +11,25 @@ public class Scene {
 	int tileHeight = 0;	//Set from map file
 	Entity player;
 	ArrayList<Entity> entities = new ArrayList<Entity>();
+	private final String mapPath;
 
 	public Scene (Game game, String path) {
-		String mapPath = "assets/" + path+"_map.scene";
+		mapPath = "assets/" + path+"_map.scene";
 		
 		player = new Entity(this, Sprites.PLAYER, 4, 4);
 			
 		try {
-			Scanner scanner = new Scanner(Scene.class.getResourceAsStream(mapPath));
-
+			//See if there's a user file
+			File userFile = new File(mapPath);
+			
+			Scanner scanner;
+			if (userFile.exists()) {
+				scanner = new Scanner(userFile);
+			} else {
+				//Use the preset
+				scanner = new Scanner(Scene.class.getResourceAsStream(mapPath));
+			}
+			
 			//Read the dimensions
 			map = new Tile[scanner.nextInt()][scanner.nextInt()];
 
@@ -24,10 +37,7 @@ public class Scene {
 			for (int row = 0; row < map.length; row++) {
 				for (int col = 0; col < map[row].length; col++) {
 					int tileID = scanner.nextInt();
-					boolean passable = TileProperties.PASSABLE.get(tileID);
-					Sprite tileSprite = new Sprite(Sprites.TILES);
-					tileSprite.setAnimation(tileID);
-					map[row][col] = new Tile(tileSprite, col, row, passable);
+					map[row][col] = new Tile(tileID, col, row);
 				}
 			}
 
@@ -67,5 +77,28 @@ public class Scene {
 		if (y < 0 || y >= map.length) { return false; }
 		if (x < 0 || x >= map[y].length) { return false; }
 		return map[y][x].passable;
+	}
+	
+	public void save() {
+		try {
+			File f = new File("assets");
+			f.mkdirs();
+			
+			PrintWriter pw = new PrintWriter(mapPath);
+			
+			pw.println(map.length + " " + map[0].length);
+			for (int row = 0; row < map.length; row++) {
+				for (int col = 0; col < map[row].length; col++) {
+					pw.print(map[row][col].tileID + " ");
+				}
+				pw.println();
+			}
+			
+			pw.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

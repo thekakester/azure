@@ -6,19 +6,22 @@ import javax.swing.JFrame;
 
 public class Game{
 	Scene scene = null;
-
+	public final int WIDTH = 240;
+	public final int HEIGHT = 160;
+	
+	
 	public Game(String[] args) {
 		//Load up the default scene
 		scene = new Scene(this, "main");
 
 		JFrame frame = new JFrame("Azure");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(240 * Frame.SCALE, 160 * Frame.SCALE);	//Gameboy advance resolution
 		
 		Frame frameObject = new Frame(this);
 		frame.add(frameObject);
 		frame.addKeyListener(frameObject);
 		frame.setVisible(true);
+		frame.pack();
 		
 		//Audio.INTRO_MUSIC.start();
 	}
