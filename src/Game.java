@@ -23,7 +23,7 @@ public class Game{
 		frame.setVisible(true);
 		frame.pack();
 		
-		//Audio.INTRO_MUSIC.start();
+		Audio.INTRO_MUSIC.start();
 	}
 
 
