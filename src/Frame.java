@@ -8,7 +8,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static int SCALE = 4;
+	public static int SCALE = 2;
 	public Game game;
 	private boolean keyMap[] = new boolean[10];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
