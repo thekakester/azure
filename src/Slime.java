@@ -3,8 +3,8 @@ import java.util.Random;
 public class Slime extends Entity{
 	Random r = new Random();
 	
-	public Slime(int x, int y) {
-		super(Sprites.SLIME, x, y);
+	public Slime(Scene scene, int x, int y) {
+		super(scene, Sprites.SLIME, x, y);
 	}
 	
 	@Override

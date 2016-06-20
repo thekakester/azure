@@ -4,10 +4,12 @@ public class Entity {
 	private int x,y,oldX,oldY;
 	private float tween = 0;
 	public Sprite sprite;
+	private final Scene scene;
 
-	public Entity(Sprite sprite, int x, int y) {
+	public Entity(Scene scene, Sprite sprite, int x, int y) {
 		this.x = this.oldX = x;
 		this.y = this.oldY = y;
+		this.scene = scene;
 
 		this.sprite = new Sprite(sprite);
 	}
@@ -52,13 +54,16 @@ public class Entity {
 		}
 	}
 
-	private void move(int newX, int newY) {
+	private void move(int deltaX, int deltaY) {
 		if (tween >= 1) {
-			oldX = x;
-			oldY = y;
-			x += newX;
-			y += newY;
-			tween = 0;
+			//Can we move to this location, or is there something there?
+			if (scene.isTilePassable(x+deltaX,y+deltaY)) {
+				oldX = x;
+				oldY = y;
+				x += deltaX;
+				y += deltaY;
+				tween = 0;
+			}
 		}
 	}
 }

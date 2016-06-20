@@ -3,8 +3,8 @@ import java.util.Random;
 public class Spooder extends Entity{
 	Random r = new Random();
 	
-	public Spooder(int x, int y) {
-		super(Sprites.SPOODER, x, y);
+	public Spooder(Scene scene, int x, int y) {
+		super(scene, Sprites.SPOODER, x, y);
 	}
 	
 	@Override

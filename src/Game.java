@@ -9,7 +9,7 @@ public class Game{
 
 	public Game(String[] args) {
 		//Load up the default scene
-		scene = new Scene("main");
+		scene = new Scene(this, "main");
 
 		JFrame frame = new JFrame("Azure");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,7 +20,7 @@ public class Game{
 		frame.addKeyListener(frameObject);
 		frame.setVisible(true);
 		
-		Audio.INTRO_MUSIC.start();
+		//Audio.INTRO_MUSIC.start();
 	}
 
 
