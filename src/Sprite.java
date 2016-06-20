@@ -11,6 +11,7 @@ public class Sprite {
 	private int animation = 0;
 	private int frame = 0;
 	public boolean play = true;
+	private final String url;
 	
 	private ArrayList<Animation> animations = new ArrayList<Animation>();
 	
@@ -19,10 +20,12 @@ public class Sprite {
 		this.animation = clone.animation;
 		this.frame = clone.frame;
 		this.animations = clone.animations;
+		this.url = clone.url;
 	}
 	
 	public Sprite(String url) {
 		url = "assets/" + url;
+		this.url = url;
 		try {
 			image = ImageIO.read(Sprite.class.getResource(url));
 		} catch (Exception e) {
@@ -46,7 +49,7 @@ public class Sprite {
 				Animation animation = new Animation(frames, rate, loops, width, height);
 				int x = 0;
 				int y = 0;
-				System.out.println("Animation:");
+				System.out.println("Animation: " + rate + "fps");
 				for (int i = 0; i < frames; i++) {
 					x += scanner.nextInt();
 					y += scanner.nextInt();
@@ -63,6 +66,7 @@ public class Sprite {
 	}
 	
 	public void setAnimation(int id) {
+		//System.out.println(this + " change animation to " + id);
 		if (animation == id) { return; }
 		animation = id;
 		frame = 0;
@@ -89,5 +93,10 @@ public class Sprite {
 		
 		Point pos = a.getFrame(frameNum);
 		g.drawImage(image,x,y,x+a.width,y+a.height,pos.x,pos.y,pos.x+a.width,pos.y+a.height,null);
+	}
+	
+	@Override
+	public String toString() {
+		return "Sprite [" + url + "]";
 	}
 }

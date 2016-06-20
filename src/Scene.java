@@ -44,11 +44,24 @@ public class Scene {
 			tileWidth = map[0][0].sprite.getWidth();
 			tileHeight = map[0][0].sprite.getHeight();
 
-			entities.add(player);
+			
+			Entity torch = new Entity(this,Sprites.OBJECTS,2,7);
+			torch.sprite.setAnimation(3);
+			torch.idle = true;
+			
+			Entity upvote = new Entity(this,Sprites.UPVOTE,14,9);
+			upvote.sprite.setAnimation(0);
+			upvote.idle = true;
+			
 			entities.add(new Slime(this, 12, 2));
 			entities.add(new Slime(this, 12, 7));
 			entities.add(new Slime(this, 7, 4));
 			entities.add(new Spooder(this, 2, 7));
+			entities.add(new Female(this, 10,4));
+			entities.add(torch);
+			entities.add(upvote);
+			
+			entities.add(player);
 			
 		} catch (Exception e) {
 			System.err.println("Failed to load map: " + mapPath);
