@@ -3,14 +3,16 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static int SCALE = 2;
+	public static int SCALE = 3;
 	public Game game;
 	private boolean keyMap[] = new boolean[11];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
@@ -19,7 +21,10 @@ public class Frame extends Component implements KeyListener{
 	//DEVELOPER VARIABLES
 	private int devX,devY;
 	private int devTileID = 0;
-
+	
+	private Point viewportPivot = new Point (16*4,16*4);	//There is a 4 tile thick border around the screen
+	private Point viewportSize;
+	
 	public Frame(Game game) {
 		this.setPreferredSize(new Dimension(game.WIDTH * SCALE,game.HEIGHT * SCALE));
 		this.game = game;
@@ -36,14 +41,35 @@ public class Frame extends Component implements KeyListener{
 		keyMapping.put(KeyEvent.VK_S,	 	Keys.R);
 		keyMapping.put(KeyEvent.VK_ESCAPE, 	Keys.DEVELOPER);
 
+		viewportSize = new Point (game.WIDTH - (8*16), game.HEIGHT - (8*16));
+		System.out.println("Movable bounds: (" + viewportSize.getX() + ", " + viewportSize.getY() + ")");
+		
 	}
 
 	@Override
 	public void paint(Graphics gs) {
+		long time = System.currentTimeMillis();
 		Graphics2D g = (Graphics2D)gs;
-		g.scale(SCALE, SCALE);
 
+		//Scale and clear the screen
+		g.scale(SCALE, SCALE);
+		g.setColor(Color.black);
+		g.fillRect(0, 0, game.WIDTH, game.HEIGHT);
+		AffineTransform original = g.getTransform();
+		
+		
+		//Call update before rendering
 		game.scene.update();
+		
+		//Adjust the viewport if necessary
+		//This is some touchy math, so I'd advise not changing this
+		if (game.scene.player.getLastPixelX() >= viewportPivot.x + viewportSize.x ) { viewportPivot.x = game.scene.player.getLastPixelX() - viewportSize.x;}
+		if (game.scene.player.getLastPixelX() < viewportPivot.x ) { viewportPivot.x = game.scene.player.getLastPixelX(); }
+		if (game.scene.player.getLastPixelY() >= viewportPivot.y + viewportSize.y ) { viewportPivot.y = game.scene.player.getLastPixelY() - viewportSize.y;}
+		if (game.scene.player.getLastPixelY() < viewportPivot.y ) { viewportPivot.y = game.scene.player.getLastPixelY(); }
+		
+		g.translate(-viewportPivot.x + (4*16), -viewportPivot.y + (4*16));
+		
 		game.scene.draw(g);
 
 		if (isKeyPressed(Keys.DEVELOPER)) {
@@ -59,9 +85,6 @@ public class Frame extends Component implements KeyListener{
 		}
 
 		if (developerMode) {
-
-			g.setColor(new Color(100,100,255,50));
-			g.fillRect(0, 0, game.WIDTH, game.HEIGHT);
 			g.setColor(new Color(255,100,100,100));
 			g.fillRect(devX * 16, devY * 16, 16, 16);
 			g.setColor(Color.red);
@@ -107,11 +130,15 @@ public class Frame extends Component implements KeyListener{
 			if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
 			if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
 			if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
-			Sprites.LOGO.draw(g, 10, 10);
 		}
+		
+		//Restore transform to draw overlay stuff
+		g.setTransform(original);
+		Sprites.LOGO.draw(g, 8, 0);
 
 		try {
-			Thread.sleep(17);
+			long endTime = System.currentTimeMillis();
+			Thread.sleep(20-(endTime-time));
 		} catch (Exception e) {
 			System.err.println("Can't sleep");
 		}

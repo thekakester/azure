@@ -6,6 +6,7 @@ public class Entity {
 	public Sprite sprite;
 	private final Scene scene;
 	public boolean idle;
+	private int tweenX,tweenY;
 
 	public Entity(Scene scene, Sprite sprite, int x, int y) {
 		this.x = this.oldX = x;
@@ -38,10 +39,10 @@ public class Entity {
 			}
 		}
 
-		int xf = Math.round((x*16*tween) + (oldX * 16 *(1-tween)));
-		int yf = Math.round((y*16*tween) + (oldY * 16 *(1-tween)));
+		tweenX = Math.round((x*16*tween) + (oldX * 16 *(1-tween)));
+		tweenY = Math.round((y*16*tween) + (oldY * 16 *(1-tween)));
 
-		sprite.draw(g, xf, yf);
+		sprite.draw(g, tweenX, tweenY - 5);	//-5 to give it that lifted feel
 	}
 
 	public void move(Direction d) {
@@ -76,5 +77,21 @@ public class Entity {
 
 	public int getY() {
 		return y;
+	}
+
+	/**This is based on the last position it was drawn
+	 * This will return the pixel coordinates of the screen, not grid coords
+	 * @return
+	 */
+	public int getLastPixelX() {
+		return tweenX;
+	}
+	
+	/**This is based on the last position it was drawn
+	 * This will return the pixel coordinates of the screen, not grid coords
+	 * @return
+	 */
+	public int getLastPixelY() {
+		return tweenY;
 	}
 }
