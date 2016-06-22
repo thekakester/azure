@@ -58,13 +58,16 @@ public class Scene {
 			//Read in this many entities
 			for (int i = 0; i < count; i++) {
 				//ID, x, y
-				int id = scanner.nextInt();
-				int x  = scanner.nextInt();
-				int y  = scanner.nextInt();
+				int id 				= scanner.nextInt();
+				int x  				= scanner.nextInt();
+				int y  				= scanner.nextInt();
 				
-				Entity e = new Entity(this,Sprites.OBJECTS,x,y);
+				Entity e = new Object(this,id, x,y);
 				e.sprite.setAnimation(id);
 				e.idle = true;	//TODO replace this with moving entity
+				
+				//Set the attributes
+				
 				objects.add(e);
 			}
 			
@@ -73,12 +76,17 @@ public class Scene {
 			upvote.sprite.setAnimation(0);
 			upvote.idle = true;
 			
+			Entity downvote = new Entity(this,Sprites.UPVOTE,20,4);
+			downvote.sprite.setAnimation(1);
+			downvote.idle = true;
+			
 			entities.add(new Slime(this, 12, 2));
 			entities.add(new Slime(this, 12, 7));
 			entities.add(new Slime(this, 7, 4));
 			entities.add(new Spooder(this, 2, 7));
 			entities.add(new Female(this, 10,4));
 			entities.add(upvote);
+			entities.add(downvote);
 			
 			entities.add(player);
 			

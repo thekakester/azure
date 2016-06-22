@@ -3,10 +3,12 @@ import java.awt.Graphics;
 public class Entity {
 	private int x,y,oldX,oldY;
 	private float tween = 0;
-	public Sprite sprite;
+	public final Sprite sprite;
 	private final Scene scene;
 	public boolean idle;
 	private int tweenX,tweenY;
+	protected int shift = 5;	//5 by default, gives 3D feel.  Can be changed
+	protected boolean passable = false;	//False by default, can be overridden
 
 	public Entity(Scene scene, Sprite sprite, int x, int y) {
 		this.x = this.oldX = x;
@@ -16,6 +18,7 @@ public class Entity {
 		this.sprite = new Sprite(sprite);
 	}
 
+	
 	public void update() {
 		tween += 1/16f;
 		if (tween >= 1) { tween = 1; }
@@ -41,8 +44,8 @@ public class Entity {
 
 		tweenX = Math.round((x*16*tween) + (oldX * 16 *(1-tween)));
 		tweenY = Math.round((y*16*tween) + (oldY * 16 *(1-tween)));
-
-		sprite.draw(g, tweenX, tweenY - 5);	//-5 to give it that lifted feel
+		
+		sprite.draw(g, tweenX, tweenY - shift);	//-5 to give it that lifted feel
 	}
 
 	public void move(Direction d) {

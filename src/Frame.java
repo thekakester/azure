@@ -13,22 +13,23 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static float SCALE = 2;
+	public static float SCALE = 3;
 	public Game game;
 	private boolean keyMap[] = new boolean[11];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
-	private boolean developerMode = false;
-	
+	private int developerMode = 0;	//0=none, 1=tiles, 2=objects 
+	private boolean paused = false;
+
 	//DEVELOPER VARIABLES
 	private int devX,devY;
 	private int devTileID = 0;
-	
+
 	private Point viewportPivot = new Point (16*4,16*4);	//There is a 4 tile thick border around the screen
 	private Point viewportSize;
-	
+
 	int fps, framesCounted = 0;
 	long lastFPSUpdate = 0;
-	
+
 	public Frame(Game game) {
 		this.setPreferredSize(new Dimension(game.WIDTH * (int)SCALE,game.HEIGHT * (int)SCALE));
 		this.game = game;
@@ -47,7 +48,7 @@ public class Frame extends Component implements KeyListener{
 
 		viewportSize = new Point (game.WIDTH - (8*16), game.HEIGHT - (8*16));
 		System.out.println("Movable bounds: (" + viewportSize.getX() + ", " + viewportSize.getY() + ")");
-		
+
 	}
 
 	@Override
@@ -56,51 +57,58 @@ public class Frame extends Component implements KeyListener{
 		Graphics2D g = (Graphics2D)gs;
 
 		//SCALE = SCALE * 0.995f;
-		
+
 		//Scale and clear the screen
 		g.scale(SCALE, SCALE);
 		g.setColor(Color.black);
 		g.fillRect(0, 0, game.WIDTH, game.HEIGHT);
 		AffineTransform original = g.getTransform();
-		
-		
+
+
 		//Call update before rendering
-		game.scene.update();
-		
+		if (!paused) {
+			game.scene.update();
+		}
+
 		//Adjust the viewport if necessary
 		//This is some touchy math, so I'd advise not changing this
 		if (game.scene.player.getLastPixelX() >= viewportPivot.x + viewportSize.x ) { viewportPivot.x = game.scene.player.getLastPixelX() - viewportSize.x;}
 		if (game.scene.player.getLastPixelX() < viewportPivot.x ) { viewportPivot.x = game.scene.player.getLastPixelX(); }
 		if (game.scene.player.getLastPixelY() >= viewportPivot.y + viewportSize.y ) { viewportPivot.y = game.scene.player.getLastPixelY() - viewportSize.y;}
 		if (game.scene.player.getLastPixelY() < viewportPivot.y ) { viewportPivot.y = game.scene.player.getLastPixelY(); }
-		
+
 		g.translate(-viewportPivot.x + (4*16), -viewportPivot.y + (4*16));
-		
+
 		//Calculate how much of the world to draw
 		Rectangle viewport = new Rectangle((viewportPivot.x/16)-5,(viewportPivot.y/16)-5,-1,-1);
 		viewport.width = (viewportSize.x/16) + 10;
 		viewport.height = (viewportSize.y/16) + 10;
-		
+
 		//Draw everything if in developer mode
-		if (developerMode) {
+		if (developerMode > 0) {
 			viewport = new Rectangle(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
 		}
-		
+
 		game.scene.draw(g, viewport);
 
 		if (isKeyPressed(Keys.DEVELOPER)) {
-			developerMode = !developerMode;	//Toggle developer mode
+			developerMode = (developerMode + 1 ) % 3;
 			unPressKey(Keys.DEVELOPER);
-			devX = game.scene.player.getX();
-			devY = game.scene.player.getY();
-			
+
+			if (developerMode == 1) {
+				devX = game.scene.player.getX();
+				devY = game.scene.player.getY();
+			}
+
 			//if they turned off dev mode, save the map
-			if (!developerMode) {
+			if (developerMode == 0) {
 				game.scene.save();
 			}
+
+			devTileID = 0;	//Reset tile
 		}
 
-		if (developerMode) {
+		if (developerMode > 0) {			
 			g.setColor(new Color(255,100,100,100));
 			g.fillRect(devX * 16, devY * 16, 16, 16);
 			g.setColor(Color.red);
@@ -112,40 +120,78 @@ public class Frame extends Component implements KeyListener{
 			if (isKeyPressed(Keys.RIGHT)) 	{ devX++; unPressKey(Keys.RIGHT);}
 
 			try {
-				
+
 				//CHANGE TILE (prev)
 				if (isKeyPressed(Keys.L)) {
 					devTileID--;
 					unPressKey(Keys.L);
 				}
-				
+
 				//CHANE TILE (Next)
 				if (isKeyPressed(Keys.R)) {
 					devTileID++;
 					unPressKey(Keys.R);
 				}
-				
+
 				//Assure we wrap properly (stay in bounds)
-				devTileID = (devTileID + TileProperties.PASSABLE.size()) % TileProperties.PASSABLE.size();
-				
-				if (isKeyPressed(Keys.A)) {
-					game.scene.map[devY][devX] = new Tile(devTileID,devX,devY);
+				if (developerMode == 1) {
+					devTileID = (devTileID + TileProperties.PASSABLE.size()) % TileProperties.PASSABLE.size();
+					if (isKeyPressed(Keys.A)) {
+						game.scene.map[devY][devX] = new Tile(devTileID,devX,devY);
+					}
+
+					//Create the tile and draw it up and left from our changer area
+					//Draw 5 dev tiles
+					for (int xi = -2; xi <= 2; xi++) {
+						int id = devTileID+xi;
+						id %= TileProperties.PASSABLE.size();
+						if (id < 0) { id += TileProperties.PASSABLE.size(); }
+
+						Tile t = new Tile(id,devX+xi, devY-1);
+						t.draw(g);
+					}
+				} else {
+					//Do the same thing as above, but with objects
+
+					devTileID = (devTileID + ObjectProperties.PASSABLE.size()) % ObjectProperties.PASSABLE.size();
+					if (isKeyPressed(Keys.A)) {
+						game.scene.objects.add(new Object(game.scene, devTileID, devX, devY));
+					}
+					if (isKeyPressed(Keys.B)) {
+						//Delete all tiles on this spot
+						boolean removed = true;
+						while (removed) {
+							removed = false;
+							for (Entity e : game.scene.objects) {
+								if (e.getX() == devX && e.getY() == devY) {
+									game.scene.objects.remove(e);
+									removed = true;
+									break;
+								}
+							}
+						}
+					}
+
+					//Create the tile and draw it up and left from our changer area
+					//Draw 5 dev tiles
+					for (int xi = -2; xi <= 2; xi++) {
+						int id = devTileID+xi;
+						id %= ObjectProperties.PASSABLE.size();
+						if (id < 0) { id += ObjectProperties.PASSABLE.size(); }
+
+						Object o = new Object(game.scene, id,devX+xi, devY-1);
+						o.draw(g);
+					}
 				}
-				
-				//Create the tile and draw it up and left from our changer area
-				//Draw 5 dev tiles
-				for (int xi = -2; xi <= 2; xi++) {
-					int id = devTileID+xi;
-					id %= TileProperties.PASSABLE.size();
-					if (id < 0) { id += TileProperties.PASSABLE.size(); }
-					
-					Tile t = new Tile(id,devX+xi, devY-1);
-					t.draw(g);
-				}
+
+				//Draw boxes around tiles
 				g.setColor(Color.gray);
 				g.drawRect((devX-2) * 16, (devY-1) * 16, 5*16, 16);
 				g.setColor(Color.white);
 				g.drawRect((devX) * 16, (devY-1) * 16, 16,16);
+
+				if (paused) {
+				}
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -157,10 +203,10 @@ public class Frame extends Component implements KeyListener{
 			if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
 			if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
 		}
-		
+
 		//Restore transform to draw overlay stuff
 		g.setTransform(original);
-		if (developerMode) {
+		if (developerMode > 0) {
 			//Draw fps
 			g.drawString(fps + "fps",10,20);
 		} else {
@@ -173,7 +219,7 @@ public class Frame extends Component implements KeyListener{
 			framesCounted = 0;
 			lastFPSUpdate = System.currentTimeMillis();
 		}
-		
+
 		try {
 			long endTime = System.currentTimeMillis();
 			Thread.sleep(20-(endTime-time));
