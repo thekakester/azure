@@ -12,7 +12,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static int SCALE = 3;
+	public static int SCALE = 1;
 	public Game game;
 	private boolean keyMap[] = new boolean[11];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
@@ -24,6 +24,9 @@ public class Frame extends Component implements KeyListener{
 	
 	private Point viewportPivot = new Point (16*4,16*4);	//There is a 4 tile thick border around the screen
 	private Point viewportSize;
+	
+	int fps, framesCounted = 0;
+	long lastFPSUpdate = 0;
 	
 	public Frame(Game game) {
 		this.setPreferredSize(new Dimension(game.WIDTH * SCALE,game.HEIGHT * SCALE));
@@ -134,8 +137,20 @@ public class Frame extends Component implements KeyListener{
 		
 		//Restore transform to draw overlay stuff
 		g.setTransform(original);
-		Sprites.LOGO.draw(g, 8, 0);
+		if (developerMode) {
+			//Draw fps
+			g.drawString(fps + "fps",10,20);
+		} else {
+			Sprites.LOGO.draw(g, 8, 0);
+		}
 
+		framesCounted++;
+		if (lastFPSUpdate < System.currentTimeMillis() - 1000) {
+			fps = framesCounted;
+			framesCounted = 0;
+			lastFPSUpdate = System.currentTimeMillis();
+		}
+		
 		try {
 			long endTime = System.currentTimeMillis();
 			Thread.sleep(20-(endTime-time));
