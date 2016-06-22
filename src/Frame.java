@@ -220,6 +220,8 @@ public class Frame extends Component implements KeyListener{
 		if (developerMode > 0) {
 			//Draw fps
 			g.drawString(fps + "fps",10,20);
+			//Draw position
+			g.drawString(devX + " " + devY, 10, 35);
 		}
 
 		framesCounted++;

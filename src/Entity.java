@@ -1,8 +1,8 @@
 import java.awt.Graphics;
 
-public class Entity {
+public class Entity implements Comparable<Entity>{
 	private int x,y,oldX,oldY;
-	private float tween = 0;
+	private float tween = 1;
 	public final Sprite sprite;
 	private final Scene scene;
 	public boolean idle;
@@ -71,9 +71,16 @@ public class Entity {
 					x += deltaX;
 					y += deltaY;
 					tween = 0;
+					return;
 				}
 			}
+			
+			//If we made it here, then we will just look
+			Direction d = Direction.getDirection(deltaX, deltaY);
+			System.out.println(d);
+			look(d);
 		}
+		
 	}
 
 	public int getX() {
@@ -98,5 +105,43 @@ public class Entity {
 	 */
 	public int getLastPixelY() {
 		return tweenY;
+	}
+
+
+	public void look(Direction direction) {
+		if (tween >= 1) {
+			if (direction == Direction.LEFT) {
+				oldX = x + 1; oldY = y;
+			} else if (direction == Direction.RIGHT) {
+				oldX = x - 1; oldY = y;
+			} else if (direction == Direction.UP){
+				oldY = y + 1; oldX = x;
+			} else {
+				oldY = y - 1; oldX = x;
+			}
+		}
+	}
+
+
+	@Override
+	public int compareTo(Entity other) {
+		int comp = Integer.compare(this.getLastPixelY(), other.getLastPixelY());
+		if (comp != 0) { return comp; }
+		
+		//Try to break the tie by last Y
+		comp = Integer.compare(this.oldY, other.oldY);
+		if (comp != 0) { return comp; }
+		
+		//If one of them is idle, they go behind
+		if (other.idle) { return 1; }
+		if (idle) { return -1; }
+		
+		//Impassible goes above
+		if (!other.passable) { return -1; }
+		if (!passable) { return 1; }
+		
+		
+		System.out.println("Can't sort entites");
+		return 0;
 	}
 }

@@ -3,6 +3,7 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Scene {
@@ -13,11 +14,13 @@ public class Scene {
 	ArrayList<Entity> entities = new ArrayList<Entity>();
 	ArrayList<Entity> objects = new ArrayList<Entity>();	//non moving entities (objects.png)
 	private final String mapPath;
+	
+	private PriorityQueue<Entity> entityDrawBuffer = new PriorityQueue<Entity>();	//Saves us from allocating each frame
 
 	public Scene (Game game, String path) {
 		mapPath = "assets/" + path+"_map.scene";
 		
-		player = new Entity(this, Sprites.PLAYER, 4, 4);
+		player = new Entity(this, Sprites.PLAYER, 11, 6);
 			
 		try {
 			//See if there's a user file
@@ -80,11 +83,14 @@ public class Scene {
 			downvote.sprite.setAnimation(1);
 			downvote.idle = true;
 			
+			Entity sarah = new Female(this, 14,5);
+			sarah.look(Direction.LEFT);
+			
 			entities.add(new Slime(this, 12, 2));
 			entities.add(new Slime(this, 12, 7));
 			entities.add(new Slime(this, 7, 4));
 			entities.add(new Spooder(this, 2, 7));
-			entities.add(new Female(this, 10,4));
+			entities.add(sarah);
 			entities.add(upvote);
 			entities.add(downvote);
 			
@@ -126,11 +132,17 @@ public class Scene {
 				map[row][col].draw(g);
 			}
 		}
+		
+		//Add our entities to our buffer
 		for (Entity e : objects) {
-			e.draw(g);
+			entityDrawBuffer.offer(e);
 		}
 		for (Entity e : entities) {
-			e.draw(g);
+			entityDrawBuffer.offer(e);
+		}
+		
+		while (!entityDrawBuffer.isEmpty()) {
+			entityDrawBuffer.remove().draw(g);
 		}
 	}
 
