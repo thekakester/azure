@@ -8,6 +8,7 @@ public class Sprites {
 	public static Sprite SPOODER;
 	public static Sprite OBJECTS;
 	public static Sprite UPVOTE;
+	public static Sprite ITEMS;
 	
 	static {
 		LOGO 		= new Sprite("logo.png");
@@ -18,5 +19,6 @@ public class Sprites {
 		SPOODER 	= new Sprite("spooder.png");
 		OBJECTS		= new Sprite("objects.png");
 		UPVOTE		= new Sprite("upvote.png");
+		ITEMS		= new Sprite("items.png");
 	}
 }

@@ -174,4 +174,18 @@ public class Scene {
 		}
 		
 	}
+
+	public boolean hasBlockingEntity(int x, int y) {
+		for (Entity e : objects) {
+			if (e.getX() == x && e.getY() == y && !e.passable) {
+				return true;
+			}
+		}
+		for (Entity e : entities) {
+			if (e.getX() == x && e.getY() == y && !e.passable) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -65,11 +65,13 @@ public class Entity {
 		if (tween >= 1) {
 			//Can we move to this location, or is there something there?
 			if (scene.isTilePassable(x+deltaX,y+deltaY)) {
-				oldX = x;
-				oldY = y;
-				x += deltaX;
-				y += deltaY;
-				tween = 0;
+				if (!scene.hasBlockingEntity(x+deltaX,y+deltaY)) {
+					oldX = x;
+					oldY = y;
+					x += deltaX;
+					y += deltaY;
+					tween = 0;
+				}
 			}
 		}
 	}

@@ -103,4 +103,8 @@ public class Sprite {
 	public int getAnimation() {
 		return animation;
 	}
+
+	public void restartAnimation() {
+		frame = 0;
+	}
 }

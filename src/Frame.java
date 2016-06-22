@@ -19,6 +19,7 @@ public class Frame extends Component implements KeyListener{
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
 	private int developerMode = 0;	//0=none, 1=tiles, 2=objects 
 	private boolean paused = false;
+	private PauseScreen pauseScreen;
 
 	//DEVELOPER VARIABLES
 	private int devX,devY;
@@ -49,6 +50,7 @@ public class Frame extends Component implements KeyListener{
 		viewportSize = new Point (game.WIDTH - (8*16), game.HEIGHT - (8*16));
 		System.out.println("Movable bounds: (" + viewportSize.getX() + ", " + viewportSize.getY() + ")");
 
+		pauseScreen = new PauseScreen(1, 1, 13, 8);
 	}
 
 	@Override
@@ -64,11 +66,14 @@ public class Frame extends Component implements KeyListener{
 		g.fillRect(0, 0, game.WIDTH, game.HEIGHT);
 		AffineTransform original = g.getTransform();
 
+		if (isKeyPressed(Keys.START)) {
+			paused = !paused;
+			Sprites.LOGO.restartAnimation();
+			unPressKey(Keys.START);
+		}
 
 		//Call update before rendering
-		if (!paused) {
-			game.scene.update();
-		}
+		game.scene.update();
 
 		//Adjust the viewport if necessary
 		//This is some touchy math, so I'd advise not changing this
@@ -190,27 +195,31 @@ public class Frame extends Component implements KeyListener{
 				g.setColor(Color.white);
 				g.drawRect((devX) * 16, (devY-1) * 16, 16,16);
 
-				if (paused) {
-				}
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 		} else {
-			if (isKeyPressed(Keys.UP)) 		{game.scene.player.move(Direction.UP);}
-			if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
-			if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
-			if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
+			if (!paused) {
+				if (isKeyPressed(Keys.UP)) 		{game.scene.player.move(Direction.UP);}
+				if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
+				if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
+				if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
+			}
 		}
 
 		//Restore transform to draw overlay stuff
 		g.setTransform(original);
+
+		if (paused) {
+			//Draw the pause screen
+			pauseScreen.draw(g);
+			Sprites.LOGO.draw(g, 8, 0);
+		}
+
 		if (developerMode > 0) {
 			//Draw fps
 			g.drawString(fps + "fps",10,20);
-		} else {
-			Sprites.LOGO.draw(g, 8, 0);
 		}
 
 		framesCounted++;
