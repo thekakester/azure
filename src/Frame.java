@@ -74,7 +74,17 @@ public class Frame extends Component implements KeyListener{
 		
 		g.translate(-viewportPivot.x + (4*16), -viewportPivot.y + (4*16));
 		
-		game.scene.draw(g, new Rectangle(viewportPivot.x,viewportPivot.y,viewportSize.x,viewportSize.y));
+		//Calculate how much of the world to draw
+		Rectangle viewport = new Rectangle((viewportPivot.x/16)-5,(viewportPivot.y/16)-5,-1,-1);
+		viewport.width = (viewportSize.x/16) + 10;
+		viewport.height = (viewportSize.y/16) + 10;
+		
+		//Draw everything if in developer mode
+		if (developerMode) {
+			viewport = new Rectangle(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+		}
+		
+		game.scene.draw(g, viewport);
 
 		if (isKeyPressed(Keys.DEVELOPER)) {
 			developerMode = !developerMode;	//Toggle developer mode

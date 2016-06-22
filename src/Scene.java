@@ -79,10 +79,10 @@ public class Scene {
 	public void draw(Graphics g, Rectangle viewport) {
 		//Calculate where to draw based on viewport
 		//Draw a 5 tile buffer around it all
-		int startRow = (viewport.y / 16) - 5;
-		int startCol = (viewport.x / 16) - 5;
-		int endRow   = startRow + (viewport.height/16) + 10;
-		int endCol   = startCol + (viewport.width/16) + 10;
+		int startRow = viewport.y;
+		int startCol = viewport.x;
+		int endRow   = startRow + viewport.height;
+		int endCol   = startCol + viewport.width;
 		
 		//Snap in bounds
 		startRow = startRow < 0 ? 0 : startRow;
