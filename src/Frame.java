@@ -12,7 +12,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static int SCALE = 3;
+	public static int SCALE = 1;
 	public Game game;
 	private boolean keyMap[] = new boolean[11];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
