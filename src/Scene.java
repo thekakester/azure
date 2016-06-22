@@ -48,7 +48,8 @@ public class Scene {
 			torch.sprite.setAnimation(3);
 			torch.idle = true;
 			
-			Entity upvote = new Entity(this,Sprites.UPVOTE,14,9);
+			//Entity upvote = new Entity(this,Sprites.UPVOTE,14,9);
+			Entity upvote = new Entity(this,Sprites.UPVOTE,11,4);
 			upvote.sprite.setAnimation(0);
 			upvote.idle = true;
 			
