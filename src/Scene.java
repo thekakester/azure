@@ -1,4 +1,5 @@
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -75,9 +76,22 @@ public class Scene {
 		}
 	}
 	
-	public void draw(Graphics g) {
-		for (int row = 0; row < map.length; row++) {
-			for (int col = 0; col < map[row].length; col++) {
+	public void draw(Graphics g, Rectangle viewport) {
+		//Calculate where to draw based on viewport
+		//Draw a 5 tile buffer around it all
+		int startRow = (viewport.y / 16) - 5;
+		int startCol = (viewport.x / 16) - 5;
+		int endRow   = startRow + (viewport.height/16) + 10;
+		int endCol   = startCol + (viewport.width/16) + 10;
+		
+		//Snap in bounds
+		startRow = startRow < 0 ? 0 : startRow;
+		startCol = startCol < 0 ? 0 : startCol;
+		endRow = endRow >= map.length ? map.length    - 1 : endRow;
+		endCol = endCol >= map.length ? map[0].length - 1 : endCol;
+		
+		for (int row = startRow; row <= endRow; row++) {
+			for (int col = startCol; col < endCol; col++) {
 				map[row][col].draw(g);
 			}
 		}

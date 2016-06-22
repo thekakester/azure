@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static int SCALE = 1;
+	public static int SCALE = 2;
 	public Game game;
 	private boolean keyMap[] = new boolean[11];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
@@ -73,7 +74,7 @@ public class Frame extends Component implements KeyListener{
 		
 		g.translate(-viewportPivot.x + (4*16), -viewportPivot.y + (4*16));
 		
-		game.scene.draw(g);
+		game.scene.draw(g, new Rectangle(viewportPivot.x,viewportPivot.y,viewportSize.x,viewportSize.y));
 
 		if (isKeyPressed(Keys.DEVELOPER)) {
 			developerMode = !developerMode;	//Toggle developer mode
