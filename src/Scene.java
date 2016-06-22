@@ -11,6 +11,7 @@ public class Scene {
 	int tileHeight = 0;	//Set from map file
 	Entity player;
 	ArrayList<Entity> entities = new ArrayList<Entity>();
+	ArrayList<Entity> objects = new ArrayList<Entity>();	//non moving entities (objects.png)
 	private final String mapPath;
 
 	public Scene (Game game, String path) {
@@ -30,6 +31,10 @@ public class Scene {
 				scanner = new Scanner(Scene.class.getResourceAsStream(mapPath));
 			}
 			
+			/**************
+			 * MAP        *
+			 **************/
+			
 			//Read the dimensions
 			map = new Tile[scanner.nextInt()][scanner.nextInt()];
 
@@ -44,10 +49,24 @@ public class Scene {
 			tileWidth = map[0][0].sprite.getWidth();
 			tileHeight = map[0][0].sprite.getHeight();
 
+			/************
+			 * Objects *
+			 ************/
 			
-			Entity torch = new Entity(this,Sprites.OBJECTS,2,7);
-			torch.sprite.setAnimation(3);
-			torch.idle = true;
+			int count = scanner.nextInt();
+			
+			//Read in this many entities
+			for (int i = 0; i < count; i++) {
+				//ID, x, y
+				int id = scanner.nextInt();
+				int x  = scanner.nextInt();
+				int y  = scanner.nextInt();
+				
+				Entity e = new Entity(this,Sprites.OBJECTS,x,y);
+				e.sprite.setAnimation(id);
+				e.idle = true;	//TODO replace this with moving entity
+				objects.add(e);
+			}
 			
 			//Entity upvote = new Entity(this,Sprites.UPVOTE,14,9);
 			Entity upvote = new Entity(this,Sprites.UPVOTE,11,4);
@@ -59,7 +78,6 @@ public class Scene {
 			entities.add(new Slime(this, 7, 4));
 			entities.add(new Spooder(this, 2, 7));
 			entities.add(new Female(this, 10,4));
-			entities.add(torch);
 			entities.add(upvote);
 			
 			entities.add(player);
@@ -71,9 +89,14 @@ public class Scene {
 	}
 
 	public void update() {
+		for (Entity e : objects) {
+			e.update();
+		}
+		
 		for (Entity e : entities) {
 			e.update();
 		}
+		
 	}
 	
 	public void draw(Graphics g, Rectangle viewport) {
@@ -94,6 +117,9 @@ public class Scene {
 			for (int col = startCol; col < endCol; col++) {
 				map[row][col].draw(g);
 			}
+		}
+		for (Entity e : objects) {
+			e.draw(g);
 		}
 		for (Entity e : entities) {
 			e.draw(g);
@@ -119,6 +145,18 @@ public class Scene {
 					pw.print(map[row][col].tileID + " ");
 				}
 				pw.println();
+			}
+			
+			pw.println();
+			pw.println();
+			
+			//Save objects
+			pw.println(objects.size());
+			
+			for (Entity e : objects) {
+				pw.print(e.sprite.getAnimation() + " ");
+				pw.print(e.getX() + " ");
+				pw.println(e.getY() + " ");
 			}
 			
 			pw.close();

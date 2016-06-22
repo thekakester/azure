@@ -13,7 +13,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 
 public class Frame extends Component implements KeyListener{
-	public static int SCALE = 2;
+	public static float SCALE = 2;
 	public Game game;
 	private boolean keyMap[] = new boolean[11];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
@@ -30,7 +30,7 @@ public class Frame extends Component implements KeyListener{
 	long lastFPSUpdate = 0;
 	
 	public Frame(Game game) {
-		this.setPreferredSize(new Dimension(game.WIDTH * SCALE,game.HEIGHT * SCALE));
+		this.setPreferredSize(new Dimension(game.WIDTH * (int)SCALE,game.HEIGHT * (int)SCALE));
 		this.game = game;
 
 		keyMapping.put(KeyEvent.VK_UP, 		Keys.UP);
@@ -55,6 +55,8 @@ public class Frame extends Component implements KeyListener{
 		long time = System.currentTimeMillis();
 		Graphics2D g = (Graphics2D)gs;
 
+		//SCALE = SCALE * 0.995f;
+		
 		//Scale and clear the screen
 		g.scale(SCALE, SCALE);
 		g.setColor(Color.black);
@@ -114,26 +116,36 @@ public class Frame extends Component implements KeyListener{
 				//CHANGE TILE (prev)
 				if (isKeyPressed(Keys.L)) {
 					devTileID--;
-					if (devTileID < 0) { devTileID++; }
 					unPressKey(Keys.L);
 				}
 				
 				//CHANE TILE (Next)
 				if (isKeyPressed(Keys.R)) {
 					devTileID++;
-					if (devTileID >= TileProperties.PASSABLE.size()) { devTileID--; }
 					unPressKey(Keys.R);
 				}
+				
+				//Assure we wrap properly (stay in bounds)
+				devTileID = (devTileID + TileProperties.PASSABLE.size()) % TileProperties.PASSABLE.size();
 				
 				if (isKeyPressed(Keys.A)) {
 					game.scene.map[devY][devX] = new Tile(devTileID,devX,devY);
 				}
 				
 				//Create the tile and draw it up and left from our changer area
-				Tile t = new Tile(devTileID,devX-1, devY-1);
-				t.draw(g);
+				//Draw 5 dev tiles
+				for (int xi = -2; xi <= 2; xi++) {
+					int id = devTileID+xi;
+					id %= TileProperties.PASSABLE.size();
+					if (id < 0) { id += TileProperties.PASSABLE.size(); }
+					
+					Tile t = new Tile(id,devX+xi, devY-1);
+					t.draw(g);
+				}
+				g.setColor(Color.gray);
+				g.drawRect((devX-2) * 16, (devY-1) * 16, 5*16, 16);
 				g.setColor(Color.white);
-				g.drawRect((devX-1) * 16, (devY-1) * 16, 16,16);
+				g.drawRect((devX) * 16, (devY-1) * 16, 16,16);
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -166,7 +178,7 @@ public class Frame extends Component implements KeyListener{
 			long endTime = System.currentTimeMillis();
 			Thread.sleep(20-(endTime-time));
 		} catch (Exception e) {
-			System.err.println("Can't sleep");
+			System.err.println("Can't keep up!  Framerate dropped!");
 		}
 		repaint();
 	}

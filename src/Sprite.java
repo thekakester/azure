@@ -99,4 +99,8 @@ public class Sprite {
 	public String toString() {
 		return "Sprite [" + url + "]";
 	}
+
+	public int getAnimation() {
+		return animation;
+	}
 }
