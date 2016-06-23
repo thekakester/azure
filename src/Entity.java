@@ -1,4 +1,5 @@
 import java.awt.Graphics;
+import java.awt.Point;
 
 public class Entity implements Comparable<Entity>{
 	private int x,y,oldX,oldY;
@@ -9,6 +10,8 @@ public class Entity implements Comparable<Entity>{
 	private int tweenX,tweenY;
 	protected int shift = 5;	//5 by default, gives 3D feel.  Can be changed
 	protected boolean passable = false;	//False by default, can be overridden
+	public boolean attention = false;
+	private Sprite status;
 
 	public Entity(Scene scene, Sprite sprite, int x, int y) {
 		this.x = this.oldX = x;
@@ -16,6 +19,8 @@ public class Entity implements Comparable<Entity>{
 		this.scene = scene;
 
 		this.sprite = new Sprite(sprite);
+		this.status = new Sprite(Sprites.ITEMS);
+		this.status.setAnimation(10);	//Attention!
 	}
 
 	
@@ -46,6 +51,10 @@ public class Entity implements Comparable<Entity>{
 		tweenY = Math.round((y*16*tween) + (oldY * 16 *(1-tween)));
 		
 		sprite.draw(g, tweenX, tweenY - shift);	//-5 to give it that lifted feel
+	
+		if (attention) {
+			status.draw(g, tweenX, tweenY - shift - 16);
+		}
 	}
 
 	public void move(Direction d) {
@@ -77,7 +86,6 @@ public class Entity implements Comparable<Entity>{
 			
 			//If we made it here, then we will just look
 			Direction d = Direction.getDirection(deltaX, deltaY);
-			System.out.println(d);
 			look(d);
 		}
 		
@@ -106,7 +114,6 @@ public class Entity implements Comparable<Entity>{
 	public int getLastPixelY() {
 		return tweenY;
 	}
-
 
 	public void look(Direction direction) {
 		if (tween >= 1) {
@@ -143,5 +150,11 @@ public class Entity implements Comparable<Entity>{
 		
 		System.out.println("Can't sort entites");
 		return 0;
+	}
+
+
+	public Point getFacingPoint() {
+		//We can just negate the direction they came from
+		return new Point(x - oldX + x, y - oldY + y);
 	}
 }

@@ -20,6 +20,8 @@ public class Frame extends Component implements KeyListener{
 	private int developerMode = 0;	//0=none, 1=tiles, 2=objects 
 	private boolean paused = false;
 	private PauseScreen pauseScreen;
+	private MessageBox messageBox;
+
 
 	//DEVELOPER VARIABLES
 	private int devX,devY;
@@ -51,6 +53,7 @@ public class Frame extends Component implements KeyListener{
 		System.out.println("Movable bounds: (" + viewportSize.getX() + ", " + viewportSize.getY() + ")");
 
 		pauseScreen = new PauseScreen(1, 1, 13, 8);
+		messageBox  = new MessageBox(0,8,15,2,7);
 	}
 
 	@Override
@@ -201,15 +204,21 @@ public class Frame extends Component implements KeyListener{
 
 		} else {
 			if (!paused) {
-				if (isKeyPressed(Keys.UP)) 		{game.scene.player.move(Direction.UP);}
-				if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
-				if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
-				if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
+				if (!game.scene.disableMovement) {
+					if (isKeyPressed(Keys.UP)) 		{game.scene.player.move(Direction.UP);}
+					if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
+					if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
+					if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
+				}
+				if (isKeyPressed(Keys.A))		{game.scene.use(game.scene.player); unPressKey(Keys.A);}
 			}
 		}
 
 		//Restore transform to draw overlay stuff
 		g.setTransform(original);
+
+		//Draw the message if there is one
+		messageBox.draw(g,game.scene.getMessage());
 
 		if (paused) {
 			//Draw the pause screen

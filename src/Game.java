@@ -1,6 +1,9 @@
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
@@ -17,6 +20,15 @@ public class Game{
 
 		JFrame frame = new JFrame("Azure");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		try {
+			//register our font
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, Game.class.getResourceAsStream("assets/font.ttf")));
+			System.out.println(Arrays.toString(ge.getAvailableFontFamilyNames()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		Frame frameObject = new Frame(this);
 		frame.add(frameObject);
