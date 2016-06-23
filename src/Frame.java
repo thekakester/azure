@@ -52,7 +52,7 @@ public class Frame extends Component implements KeyListener{
 		viewportSize = new Point (game.WIDTH - (8*16), game.HEIGHT - (8*16));
 		System.out.println("Movable bounds: (" + viewportSize.getX() + ", " + viewportSize.getY() + ")");
 
-		pauseScreen = new PauseScreen(1, 1, 13, 8);
+		pauseScreen = new PauseScreen(1, 1, 13, 8, 7);
 		messageBox  = new MessageBox(0,8,15,2,7);
 	}
 
@@ -222,7 +222,7 @@ public class Frame extends Component implements KeyListener{
 
 		if (paused) {
 			//Draw the pause screen
-			pauseScreen.draw(g);
+			pauseScreen.draw(g, game.scene.player);
 			Sprites.LOGO.draw(g, 8, 0);
 		}
 

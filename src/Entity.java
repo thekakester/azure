@@ -12,6 +12,7 @@ public class Entity implements Comparable<Entity>{
 	protected boolean passable = false;	//False by default, can be overridden
 	public boolean attention = false;
 	private Sprite status;
+	private Item[] inventory = new Item[30];
 
 	public Entity(Scene scene, Sprite sprite, int x, int y) {
 		this.x = this.oldX = x;
@@ -21,6 +22,11 @@ public class Entity implements Comparable<Entity>{
 		this.sprite = new Sprite(sprite);
 		this.status = new Sprite(Sprites.ITEMS);
 		this.status.setAnimation(10);	//Attention!
+		
+		inventory[3] = new Item();
+		inventory[8] = new Item();
+		inventory[11] = new Item();
+		inventory[29] = new Item();
 	}
 
 	
@@ -55,6 +61,11 @@ public class Entity implements Comparable<Entity>{
 		if (attention) {
 			status.draw(g, tweenX, tweenY - shift - 16);
 		}
+	}
+	
+	public Item getItem(int inventoryID) {
+		if (inventoryID < 0 || inventoryID >= inventory.length) { return null; }
+		return inventory[inventoryID];
 	}
 
 	public void move(Direction d) {
