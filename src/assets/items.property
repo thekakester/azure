@@ -1,0 +1,4 @@
+#Animation (in Items.png), name, description
+# BE CAREFUL!  Modifying this file may change item IDs which could cause a lot of havoc!
+21,Banana,Can be planted
+20,Pickaxe,Has no use... yet

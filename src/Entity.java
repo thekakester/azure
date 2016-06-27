@@ -23,10 +23,11 @@ public class Entity implements Comparable<Entity>{
 		this.status = new Sprite(Sprites.ITEMS);
 		this.status.setAnimation(10);	//Attention!
 		
-		inventory[3] = new Item();
-		inventory[8] = new Item();
-		inventory[11] = new Item();
-		inventory[29] = new Item();
+		inventory[3] = new Item(Items.findByName("banana"));
+		inventory[8] = new Item(Items.findByName("pickaxe"));
+		inventory[11] = new Item(Items.findByName("pickaxe"));
+		inventory[29] = new Item(Items.findByName("banana"));
+		inventory[20] = new Item(Items.findByName("pickaxe"));
 	}
 
 	

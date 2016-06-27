@@ -11,7 +11,6 @@ public class Sprite {
 	private int animation = 0;
 	private int frame = 0;
 	public boolean play = true;
-	private final String url;
 	
 	private ArrayList<Animation> animations = new ArrayList<Animation>();
 	
@@ -20,12 +19,10 @@ public class Sprite {
 		this.animation = clone.animation;
 		this.frame = clone.frame;
 		this.animations = clone.animations;
-		this.url = clone.url;
 	}
 	
 	public Sprite(String url) {
 		url = "assets/" + url;
-		this.url = url;
 		try {
 			image = ImageIO.read(Sprite.class.getResource(url));
 		} catch (Exception e) {
@@ -97,7 +94,7 @@ public class Sprite {
 	
 	@Override
 	public String toString() {
-		return "Sprite [" + url + "]";
+		return "Sprite [ URL REMOVED ]";
 	}
 
 	public int getAnimation() {
