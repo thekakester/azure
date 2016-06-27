@@ -1,22 +1,20 @@
 import java.awt.Graphics;
 
 public class Tile {
-	public final Sprite sprite;
-	public boolean passable = true;
 	public final int x,y;
-	public final int tileID;
+	final TileInfo info;
 	
-	public Tile(int tileID, int x, int y) {
-		this.sprite = new Sprite(Sprites.TILES);
-		this.sprite.setAnimation(tileID);
-		
-		this.passable = TileProperties.PASSABLE.get(tileID);
+	public Tile(TileInfo info, int x, int y) {
+		this.info = info;
 		this.x = x;
 		this.y = y;
-		this.tileID = tileID;
 	}
 	
 	public void draw(Graphics g) {
-		sprite.draw(g, x*sprite.getWidth(), y*sprite.getHeight());
+		info.draw(g,x,y);
+	}
+
+	public boolean isPassable() {
+		return info.passable;
 	}
 }

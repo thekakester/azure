@@ -1,14 +1,16 @@
-0 1
-0 1
-0 1
-0 1
-0 0
-0 0
-0 0
-0 1
-0 1
-0 1
-0 1
-0 1
-0 1
-1 0
+#Animation, Passable, Vertical Shift, Z Index, Name
+0,0,1,0,Orange Torch
+1,0,1,0,Blue Torch
+2,0,1,0,Red Torch
+3,0,1,0,Green Torch
+4,0,0,0,Door
+5,0,0,0,Window
+6,0,0,1,Javert
+7,0,1,0,Top Left Fence
+8,0,1,0,Fence
+9,0,1,0,Top Right Fence
+10,0,1,0,Side Fence
+11,0,1,0,Bottom Left Fence
+12,0,1,0,Bottom Right Fence
+13,1,0,1,Sprout
+14,1,0,0,Soil

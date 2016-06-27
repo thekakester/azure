@@ -12,7 +12,8 @@ public class Entity implements Comparable<Entity>{
 	protected boolean passable = false;	//False by default, can be overridden
 	public boolean attention = false;
 	private Sprite status;
-	private Item[] inventory = new Item[30];
+	private Item[] inventory = new Item[33];
+	int inventorySelection = 0;
 
 	public Entity(Scene scene, Sprite sprite, int x, int y) {
 		this.x = this.oldX = x;
@@ -168,5 +169,9 @@ public class Entity implements Comparable<Entity>{
 	public Point getFacingPoint() {
 		//We can just negate the direction they came from
 		return new Point(x - oldX + x, y - oldY + y);
+	}
+
+	public String getName() {
+		return "Unnamed";
 	}
 }

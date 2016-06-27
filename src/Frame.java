@@ -15,13 +15,12 @@ import javax.swing.JFrame;
 public class Frame extends Component implements KeyListener{
 	public static float SCALE = 3;
 	public Game game;
-	private boolean keyMap[] = new boolean[11];
+	private boolean keyMap[] = new boolean[12];
 	private HashMap<Integer,Keys> keyMapping = new HashMap<Integer,Keys>();
 	private int developerMode = 0;	//0=none, 1=tiles, 2=objects 
-	private boolean paused = false;
+	private boolean userPaused = false;
 	private PauseScreen pauseScreen;
 	private MessageBox messageBox;
-
 
 	//DEVELOPER VARIABLES
 	private int devX,devY;
@@ -70,10 +69,17 @@ public class Frame extends Component implements KeyListener{
 		AffineTransform original = g.getTransform();
 
 		if (isKeyPressed(Keys.START)) {
-			paused = !paused;
-			Sprites.LOGO.restartAnimation();
+			//Only do this if we're not in a selection screen
+			if (!game.scene.selectItem) {
+				userPaused = !userPaused;
+				Sprites.LOGO.restartAnimation();
+			} else {
+				game.scene.selectItem = false;	//disable
+			}
 			unPressKey(Keys.START);
 		}
+
+		boolean paused = userPaused || game.scene.selectItem;
 
 		//Call update before rendering
 		game.scene.update();
@@ -143,27 +149,27 @@ public class Frame extends Component implements KeyListener{
 
 				//Assure we wrap properly (stay in bounds)
 				if (developerMode == 1) {
-					devTileID = (devTileID + TileProperties.PASSABLE.size()) % TileProperties.PASSABLE.size();
+					devTileID = (devTileID + Tiles.tile.length) % Tiles.tile.length;
 					if (isKeyPressed(Keys.A)) {
-						game.scene.map[devY][devX] = new Tile(devTileID,devX,devY);
+						game.scene.map[devY][devX] = new Tile(Tiles.tile[devTileID],devX,devY);
 					}
 
 					//Create the tile and draw it up and left from our changer area
 					//Draw 5 dev tiles
 					for (int xi = -2; xi <= 2; xi++) {
 						int id = devTileID+xi;
-						id %= TileProperties.PASSABLE.size();
-						if (id < 0) { id += TileProperties.PASSABLE.size(); }
+						id %= Tiles.tile.length;
+						if (id < 0) { id += Tiles.tile.length; }
 
-						Tile t = new Tile(id,devX+xi, devY-1);
+						Tile t = new Tile(Tiles.tile[id],devX+xi, devY-1);
 						t.draw(g);
 					}
 				} else {
 					//Do the same thing as above, but with objects
 
-					devTileID = (devTileID + ObjectProperties.PASSABLE.size()) % ObjectProperties.PASSABLE.size();
+					devTileID = (devTileID + Objects.object.length) % Objects.object.length;
 					if (isKeyPressed(Keys.A)) {
-						game.scene.objects.add(new Object(game.scene, devTileID, devX, devY));
+						game.scene.objects.add(new Object(game.scene, Objects.object[devTileID], devX, devY));
 					}
 					if (isKeyPressed(Keys.B)) {
 						//Delete all tiles on this spot
@@ -184,10 +190,10 @@ public class Frame extends Component implements KeyListener{
 					//Draw 5 dev tiles
 					for (int xi = -2; xi <= 2; xi++) {
 						int id = devTileID+xi;
-						id %= ObjectProperties.PASSABLE.size();
-						if (id < 0) { id += ObjectProperties.PASSABLE.size(); }
+						id %= Objects.object.length;
+						if (id < 0) { id += Objects.object.length; }
 
-						Object o = new Object(game.scene, id,devX+xi, devY-1);
+						Object o = new Object(game.scene, Objects.object[id],devX+xi, devY-1);
 						o.draw(g);
 					}
 				}
@@ -203,14 +209,33 @@ public class Frame extends Component implements KeyListener{
 			}
 
 		} else {
-			if (!paused) {
-				if (!game.scene.disableMovement) {
-					if (isKeyPressed(Keys.UP)) 		{game.scene.player.move(Direction.UP);}
-					if (isKeyPressed(Keys.DOWN)) 	{game.scene.player.move(Direction.DOWN);}
-					if (isKeyPressed(Keys.LEFT)) 	{game.scene.player.move(Direction.LEFT);}
-					if (isKeyPressed(Keys.RIGHT)) 	{game.scene.player.move(Direction.RIGHT);}
+			//Find a direction based on keys
+			Direction dir = Direction.NONE;
+			Keys keyPressed = Keys.NONE;
+			if (isKeyPressed(Keys.UP)) 		{dir = Direction.UP;	keyPressed = Keys.UP;}
+			if (isKeyPressed(Keys.DOWN)) 	{dir = Direction.DOWN;	keyPressed = Keys.DOWN;}
+			if (isKeyPressed(Keys.LEFT)) 	{dir = Direction.LEFT;	keyPressed = Keys.LEFT;}
+			if (isKeyPressed(Keys.RIGHT)) 	{dir = Direction.RIGHT;	keyPressed = Keys.RIGHT;}
+
+			if (!game.scene.disableMovement && !paused) {
+				game.scene.player.move(dir);
+			}
+
+			if (paused) {
+				pauseScreen.moveSelection(dir);
+				unPressKey(keyPressed);
+			}
+			if (isKeyPressed(Keys.A)) {
+				//Are we selecting an item
+				if (game.scene.selectItem) {
+					//Plant a banana
+					Point target = game.scene.player.getFacingPoint();
+					game.scene.objects.add(new Object(game.scene,Objects.object[13],target.x,target.y));
+					game.scene.selectItem = false;
+				} else {
+					game.scene.use(game.scene.player); 
 				}
-				if (isKeyPressed(Keys.A))		{game.scene.use(game.scene.player); unPressKey(Keys.A);}
+				unPressKey(Keys.A);
 			}
 		}
 

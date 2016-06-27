@@ -18,6 +18,7 @@ public class Scene {
 	private String message = null;
 	private int messageVisibleLength = 0;	//How much of the message will appear on the screen
 	public boolean disableMovement = false;	//Should we lock the player controls?
+	public boolean selectItem = false;		//Does the inventory need to be shown?
 
 	private PriorityQueue<Entity> entityDrawBuffer = new PriorityQueue<Entity>();	//Saves us from allocating each frame
 
@@ -49,12 +50,12 @@ public class Scene {
 			for (int row = 0; row < map.length; row++) {
 				for (int col = 0; col < map[row].length; col++) {
 					int tileID = scanner.nextInt();
-					map[row][col] = new Tile(tileID, col, row);
+					map[row][col] = new Tile(Tiles.tile[tileID], col, row);
 				}
 			}
 
-			tileWidth = map[0][0].sprite.getWidth();
-			tileHeight = map[0][0].sprite.getHeight();
+			tileWidth = map[0][0].info.sprite.getWidth();
+			tileHeight = map[0][0].info.sprite.getHeight();
 
 			/************
 			 * Objects *
@@ -69,7 +70,7 @@ public class Scene {
 				int x  				= scanner.nextInt();
 				int y  				= scanner.nextInt();
 
-				Entity e = new Object(this,id, x,y);
+				Entity e = new Object(this,Objects.object[id], x,y);
 				e.sprite.setAnimation(id);
 				e.idle = true;	//TODO replace this with moving entity
 
@@ -140,6 +141,9 @@ public class Scene {
 		endRow = endRow >= map.length ? map.length    - 1 : endRow;
 		endCol = endCol >= map.length ? map[0].length - 1 : endCol;
 
+		//Manually update the sprite frames since they all reference the same thing
+		Tiles.nextFrame();
+
 		for (int row = startRow; row <= endRow; row++) {
 			for (int col = startCol; col < endCol; col++) {
 				map[row][col].draw(g);
@@ -162,7 +166,7 @@ public class Scene {
 	public boolean isTilePassable(int x, int y) {
 		if (y < 0 || y >= map.length) { return false; }
 		if (x < 0 || x >= map[y].length) { return false; }
-		return map[y][x].passable;
+		return map[y][x].isPassable();
 	}
 
 	public void save() {
@@ -175,7 +179,7 @@ public class Scene {
 			pw.println(map.length + " " + map[0].length);
 			for (int row = 0; row < map.length; row++) {
 				for (int col = 0; col < map[row].length; col++) {
-					pw.print(map[row][col].tileID + " ");
+					pw.print(map[row][col].info.tileID + " ");
 				}
 				pw.println();
 			}
@@ -215,7 +219,15 @@ public class Scene {
 	}
 
 	public Entity getEntityAt(int x, int y) {
+		//Try entities
 		for (Entity e : entities) {
+			if (e.getX() == x && e.getY() == y) {
+				return e;
+			}
+		}
+
+		//Try objects
+		for (Entity e : objects) {
 			if (e.getX() == x && e.getY() == y) {
 				return e;
 			}
@@ -256,7 +268,14 @@ public class Scene {
 		//Get what's in front of the player
 		Entity target = getEntityLookingAt(entity);
 
-		if (target == null) { message = null; return; }
+		if (target == null) { selectItem = false; message = null; disableMovement = false; return; }
+
+		if (target.getName().equalsIgnoreCase("soil")) {
+			//Bring up the inventory
+			selectItem = true;
+			return;
+		}
+
 		if (isMessageFullyDisplayed()) {
 			disableMovement = false;
 			message = null;
@@ -265,7 +284,8 @@ public class Scene {
 				//Make it full
 				forceMessageDisplay();
 			} else {
-				setMessage("Hello weary traveler!\nMy name is SARAH and I am here to guide\nyou on your journey");
+				//setMessage("Hello weary traveler!\nMy name is SARAH and I am here to guide\nyou on your journey");
+				setMessage(target.getName());
 			}
 		}
 	}
